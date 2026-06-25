@@ -1,0 +1,269 @@
+openapi: "3.1.0"
+info:
+  title: "Virtual ISS MCP API"
+  version: "0.1.0"
+  description: "Model Context Protocol interface for Virtual ISS simulation"
+servers:
+  - url: "http://localhost:8331"
+paths:
+  /api/v1/telemetry/{subsystem}:
+    get:
+      summary: "Get latest telemetry for a subsystem"
+      operationId: "getTelemetry"
+      parameters:
+        - name: "subsystem"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            enum:
+              - dynamics
+              - gnc
+              - eps
+              - eclss
+              - thermal
+              - comms
+              - cdh
+              - crew
+      responses:
+        "200":
+          description: "Latest telemetry snapshot"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TelemetryData"
+
+  /api/v1/telemetry/{subsystem}/history:
+    get:
+      summary: "Get telemetry history for a subsystem"
+      operationId: "getTelemetryHistory"
+      parameters:
+        - name: "subsystem"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "limit"
+          in: "query"
+          schema:
+            type: "integer"
+            default: 100
+      responses:
+        "200":
+          description: "Telemetry time series"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/TelemetryData"
+
+  /api/v1/command:
+    post:
+      summary: "Send a command to a subsystem"
+      operationId: "sendCommand"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendCommandRequest"
+      responses:
+        "200":
+          description: "Command result"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommandResponse"
+
+  /api/v1/subsystems:
+    get:
+      summary: "List all subsystems"
+      operationId: "listSubsystems"
+      responses:
+        "200":
+          description: "Available subsystems"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  subsystems:
+                    type: "array"
+                    items:
+                      $ref: "#/components/schemas/SubsystemInfo"
+
+  /api/v1/scenario:
+    get:
+      summary: "Get current scenario information"
+      operationId: "getScenario"
+      responses:
+        "200":
+          description: "Current scenario"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScenarioInfo"
+
+  /api/v1/status:
+    get:
+      summary: "Health check endpoint"
+      operationId: "getStatus"
+      responses:
+        "200":
+          description: "Service status"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusResponse"
+
+  /api/v1/stream:
+    get:
+      summary: "SSE endpoint for real-time telemetry streaming"
+      operationId: "streamTelemetry"
+      responses:
+        "200":
+          description: "Server-Sent Events stream"
+          content:
+            text/event-stream:
+              schema:
+                type: "string"
+
+  /api/v1/tools:
+    get:
+      summary: "List available MCP tools"
+      operationId: "listTools"
+      responses:
+        "200":
+          description: "Tool definitions"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  tools:
+                    type: "array"
+                    items:
+                      $ref: "#/components/schemas/ToolDefinition"
+
+  /api/v1/tools/{tool_name}:
+    post:
+      summary: "Execute a tool by name"
+      operationId: "executeTool"
+      parameters:
+        - name: "tool_name"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                args:
+                  type: "object"
+      responses:
+        "200":
+          description: "Tool execution result"
+          content:
+            application/json:
+              schema:
+                type: "object"
+
+components:
+  schemas:
+    TelemetryData:
+      type: "object"
+      properties:
+        timestamp:
+          type: "string"
+          format: "date-time"
+        sim_time_sec:
+          type: "number"
+      additionalProperties: true
+
+    SendCommandRequest:
+      type: "object"
+      required:
+        - target
+        - opcode
+      properties:
+        target:
+          type: "string"
+          description: "Target subsystem"
+        opcode:
+          type: "string"
+          description: "Command opcode"
+        args:
+          type: "object"
+          description: "Command arguments"
+          additionalProperties: true
+
+    CommandResponse:
+      type: "object"
+      properties:
+        cmd_id:
+          type: "string"
+        success:
+          type: "boolean"
+        message:
+          type: "string"
+        error:
+          type: "string"
+
+    SubsystemInfo:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+
+    ScenarioInfo:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        name:
+          type: "string"
+        description:
+          type: "string"
+        subsystems:
+          type: "array"
+          items:
+            type: "string"
+        time_scale:
+          type: "number"
+        duration_sec:
+          type: "number"
+
+    StatusResponse:
+      type: "object"
+      properties:
+        service:
+          type: "string"
+        status:
+          type: "string"
+        subsystems:
+          type: "object"
+          additionalProperties:
+            type: "object"
+            properties:
+              online:
+                type: "boolean"
+              timestamp:
+                type: "string"
+
+    ToolDefinition:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+        input_schema:
+          type: "object"
+        output_schema:
+          type: "object"
