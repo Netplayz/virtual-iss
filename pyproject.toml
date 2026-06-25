@@ -1,0 +1,30 @@
+[project]
+name = "virtual-iss"
+version = "0.1.0"
+description = "Virtual ISS Simulation — open-source 1:1 scale ISS software simulation"
+requires-python = ">=3.12"
+dependencies = [
+    "nats-py>=2.9.0",
+    "pydantic>=2.0",
+    "numpy>=2.0",
+    "scipy>=1.14",
+    "click>=8.0",
+    "rich>=13.0",
+    "pyyaml>=6.0",
+]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["subsystems/*", "orchestrator", "bus"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.mypy]
+strict = true
+python_version = "3.12"

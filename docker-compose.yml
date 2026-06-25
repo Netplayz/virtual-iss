@@ -1,0 +1,151 @@
+version: "3.9"
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  nats:
+    image: nats:2.10-alpine
+    command: ["-js", "-c", "/etc/nats/nats.conf"]
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    volumes:
+      - ./bus/nats.conf:/etc/nats/nats.conf:ro
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "nats", "ping", "-c", "1"]
+      interval: 5s
+      timeout: 2s
+      retries: 5
+
+  dynamics:
+    build:
+      context: .
+      dockerfile: dynamics/Dockerfile
+    depends_on: ["nats"]
+    environment:
+      - NATS_URL=nats://nats:4222
+      - RUST_LOG=info
+    logging: *default-logging
+
+  gnc:
+    build:
+      context: .
+      dockerfile: gnc/Dockerfile
+    depends_on: ["nats"]
+    environment:
+      - NATS_URL=nats://nats:4222
+      - RUST_LOG=info
+    logging: *default-logging
+
+  eps:
+    build:
+      context: .
+      dockerfile: subsystems/eps/Dockerfile
+    depends_on: ["nats"]
+    environment:
+      - NATS_URL=nats://nats:4222
+    logging: *default-logging
+
+  eclss:
+    build:
+      context: .
+      dockerfile: subsystems/eclss/Dockerfile
+    depends_on: ["nats"]
+    environment:
+      - NATS_URL=nats://nats:4222
+    logging: *default-logging
+
+  thermal:
+    build:
+      context: .
+      dockerfile: subsystems/thermal/Dockerfile
+    depends_on: ["nats"]
+    environment:
+      - NATS_URL=nats://nats:4222
+    logging: *default-logging
+
+  comms:
+    build:
+      context: .
+      dockerfile: subsystems/comms/Dockerfile
+    depends_on: ["nats"]
+    environment:
+      - NATS_URL=nats://nats:4222
+    logging: *default-logging
+
+  cdh:
+    build:
+      context: .
+      dockerfile: subsystems/cdh/Dockerfile
+    depends_on: ["nats"]
+    environment:
+      - NATS_URL=nats://nats:4222
+    logging: *default-logging
+
+  crew:
+    build:
+      context: .
+      dockerfile: subsystems/crew/Dockerfile
+    depends_on: ["nats"]
+    environment:
+      - NATS_URL=nats://nats:4222
+    logging: *default-logging
+
+  nas:
+    build:
+      context: .
+      dockerfile: subsystems/nas/Dockerfile
+    depends_on: ["nats"]
+    ports:
+      - "8330:8330"
+    environment:
+      - NATS_URL=nats://nats:4222
+      - NAS_DATA_DIR=/data
+    volumes:
+      - nas_data:/data
+    logging: *default-logging
+
+  mcp:
+    build:
+      context: .
+      dockerfile: subsystems/mcp/Dockerfile
+    depends_on: ["nats"]
+    ports:
+      - "8331:8331"
+    environment:
+      - NATS_URL=nats://nats:4222
+      - MCP_PORT=8331
+    logging: *default-logging
+
+  orchestrator:
+    build:
+      context: .
+      dockerfile: orchestrator/Dockerfile
+    depends_on: ["nats"]
+    environment:
+      - NATS_URL=nats://nats:4222
+    ports:
+      - "8300:8300"
+    volumes:
+      - ./scenarios:/scenarios:ro
+    logging: *default-logging
+
+  dashboard:
+    build:
+      context: viz/dashboard
+      dockerfile: Dockerfile
+    depends_on: ["nats"]
+    ports:
+      - "8320:8320"
+    environment:
+      - NATS_URL=nats://nats:4222
+      - OPENMCT_PORT=8320
+    logging: *default-logging
+
+volumes:
+  nas_data:
