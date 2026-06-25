@@ -1,0 +1,27 @@
+# Electrical Power System Configuration
+[solar_arrays]
+type = "triple_junction_gaas"
+panel_count = 8
+panel_area_m2 = 38.2
+efficiency = 0.30
+max_power_gen_kw = 84.0
+degradation_per_year = 0.02
+
+[batteries]
+type = "li_ion"
+capacity_ah = 300
+nominal_voltage_v = 120
+max_soc = 0.95
+min_soc = 0.15
+cells_per_battery = 48
+battery_count = 4
+
+[distribution]
+bus_voltage_nominal_v = 120
+bus_voltage_min_v = 113
+bus_voltage_max_v = 126
+load_shed_priority_count = 8
+
+[ddcu]
+count = 32
+efficiency = 0.94

@@ -1,0 +1,41 @@
+# ISS Vehicle Configuration
+[vehicle]
+name = "International Space Station"
+mass_kg = 419725
+length_m = 109.0
+width_m = 73.0
+height_m = 27.5
+truss_length_m = 108.5
+
+[vehicle.inertia]
+ixx = 4.12e7
+iyy = 1.24e8
+izz = 1.35e8
+ixy = 0.0
+ixz = 0.0
+iyz = 0.0
+
+[vehicle.solar_arrays]
+count = 8
+panel_area_m2 = 38.2
+efficiency = 0.30
+max_power_kw = 84.0
+
+[vehicle.radiators]
+count = 14
+total_area_m2 = 370.0
+
+[vehicle.cmg]
+cluster = "pyramid"  # pyramid, box, or triple
+count = 4
+max_momentum_nms = 3500
+max_torque_nm = 130
+
+[orbit]
+semi_major_axis_km = 6780.0
+eccentricity = 0.001
+inclination_deg = 51.64
+raan_deg = 0.0
+arg_perigee_deg = 0.0
+true_anomaly_deg = 0.0
+epoch = "2026-06-25T12:00:00Z"

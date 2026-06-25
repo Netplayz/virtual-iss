@@ -1,0 +1,16 @@
+{
+  "id": "nominal_ops",
+  "name": "Nominal ISS Operations",
+  "description": "Standard 90-minute orbit with all subsystems nominal",
+  "initial_orbit": {
+    "semi_major_axis_km": 6780.0,
+    "eccentricity": 0.001,
+    "inclination_deg": 51.64
+  },
+  "subsystems": ["dynamics", "gnc", "eps", "eclss", "thermal", "comms", "cdh", "crew"],
+  "duration_sec": 5400.0,
+  "time_scale": 1.0,
+  "crew_count": 7,
+  "initial_beta_angle_deg": 60.0,
+  "faults": []
+}

@@ -1,0 +1,21 @@
+{
+  "id": "load_shed_test",
+  "name": "Power Load Shedding Scenario",
+  "description": "Simulate solar array degradation leading to automatic load shedding",
+  "initial_orbit": {
+    "semi_major_axis_km": 6780.0,
+    "eccentricity": 0.001,
+    "inclination_deg": 51.64
+  },
+  "subsystems": ["dynamics", "gnc", "eps", "eclss", "thermal", "cdh"],
+  "duration_sec": 7200.0,
+  "time_scale": 5.0,
+  "faults": [
+    {
+      "time_sec": 600.0,
+      "subsystem": "eps",
+      "type": "solar_array_failure",
+      "params": {"panel_id": 3, "degradation": 0.5}
+    }
+  ]
+}

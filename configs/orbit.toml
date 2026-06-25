@@ -1,0 +1,16 @@
+# Initial Orbit Configuration
+[initial]
+semi_major_axis_km = 6780.0
+eccentricity = 0.001
+inclination_deg = 51.64
+raan_deg = 45.0
+arg_perigee_deg = 0.0
+true_anomaly_deg = 0.0
+epoch = "2026-06-25T12:00:00Z"
+
+[propagation]
+type = "sgp4"
+drag_coefficient = 2.2
+solar_flux_10p7_cm = 150.0
+geomagnetic_index = 15.0
+step_size_s = 0.1

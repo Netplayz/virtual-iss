@@ -1,0 +1,29 @@
+# ECLSS Configuration
+[cabin]
+target_pressure_kpa = 101.3
+target_temp_c = 22.0
+target_humidity_pct = 50.0
+volume_m3 = 930.0
+o2_partial_target_kpa = 21.2
+co2_removal_threshold_kpa = 0.4
+
+[o2_generation]
+type = "electrolysis"
+max_rate_kg_day = 5.4
+energy_per_kg_kwh = 12.0
+
+[co2_scrubbing]
+type = "cdra"
+max_rate_kg_day = 4.0
+regeneration_interval_min = 144
+
+[water_recovery]
+urine_recovery_pct = 85.0
+humidity_recovery_pct = 95.0
+max_production_l_day = 6.8
+
+[crew_consumption]
+o2_per_person_kg_day = 0.84
+co2_per_person_kg_day = 1.0
+water_per_person_l_day = 2.8
+food_per_person_kg_day = 1.8
