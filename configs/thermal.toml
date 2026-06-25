@@ -1,0 +1,38 @@
+# Thermal Control System Configuration
+[loops]
+count = 2
+names = ["Loop A", "Loop B"]
+coolant_type = "ammonia"
+pump_speed_min_rpm = 1000
+pump_speed_max_rpm = 9000
+
+[loop_a]
+target_temp_c = 3.0
+max_temp_c = 10.0
+min_temp_c = -5.0
+flow_rate_lpm = 150
+
+[loop_b]
+target_temp_c = 3.0
+max_temp_c = 10.0
+min_temp_c = -5.0
+flow_rate_lpm = 150
+
+[radiators]
+count = 14
+total_area_m2 = 370.0
+deployment_angle_max_deg = 90.0
+emissivity = 0.85
+solar_absorptivity = 0.25
+
+[heaters]
+zone_count = 8
+power_per_zone_w = 250.0
+pid_kp = 1.5
+pid_ki = 0.05
+pid_kd = 0.3
+setpoint_c = 4.0
+
+[mli]
+layers = 15
+effective_emissivity = 0.005

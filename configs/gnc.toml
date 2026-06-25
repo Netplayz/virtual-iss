@@ -1,0 +1,34 @@
+# GN&C Configuration
+[control]
+mode = "inertial_hold"
+rate_hz = 10.0
+
+[estimator]
+type = "multiplicative_ekf"
+gyro_noise_density = 1.0e-6
+gyro_random_walk = 1.0e-8
+star_tracker_noise_rad = 1.0e-4
+sun_sensor_noise_rad = 5.0e-3
+mag_noise_ut = 50.0
+gps_noise_m = 10.0
+
+[attitude_control]
+kp = 0.5
+ki = 0.01
+kd = 0.1
+integral_limit = 0.5
+output_limit = 130.0
+
+[cmg]
+cluster = "pyramid"
+count = 4
+max_momentum_nms = 3500.0
+max_torque_nm = 130.0
+singularity_threshold = 0.01
+
+[sensors]
+star_tracker_count = 2
+gyro_count = 3
+sun_sensor_count = 4
+magnetometer = true
+gps_receiver = true

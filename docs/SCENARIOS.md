@@ -22,6 +22,7 @@ Scenarios are JSON files in `configs/scenarios/`. Each includes initial conditio
 
 - **nominal_ops** — Standard 90-min orbit, all subsystems, crew of 7, no faults
 - **load_shed_test** — Solar array failure at T+600s, verify automatic load shedding
+- **fault_injection_test** — Multi-fault cascade: solar panels (T+300, T+600), O₂ gen (T+900), star tracker (T+1200), cabin leak (T+1500), battery (T+1800)
 
 ## Creating
 
@@ -39,6 +40,16 @@ Scenarios are JSON files in `configs/scenarios/`. Each includes initial conditio
 | `co2_scrub_fault` | eclss | `bed_stuck` |
 | `sensor_failure` | gnc | `sensor`, `mode` |
 | `attitude_anomaly` | gnc | `torque_bias_nm` |
+| `star_tracker_failure` | gnc | — |
+| `gyro_drift` | gnc | `drift_rads` |
+| `sun_sensor_failure` | gnc | — |
+| `gps_failure` | gnc | — |
+| `battery_failure` | eps | — |
+| `bus_degradation` | eps | `amount` (0.0–0.5) |
+| `o2_gen_fault` | eclss | — |
+| `co2_scrub_fault` | eclss | — |
+| `water_recovery_fault` | eclss | — |
+| `cabin_leak` | eclss | `leak_rate_kpa_s` |
 
 ## API
 

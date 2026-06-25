@@ -45,7 +45,7 @@ pub struct StarTrackerOutput {
     pub error_arcsec: f64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct GyroOutput {
     pub angular_rate: Vector3<f64>,
     pub timestamp: String,
@@ -53,19 +53,19 @@ pub struct GyroOutput {
     pub noise: Vector3<f64>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct SunSensorOutput {
     pub sun_vector_body: Vector3<f64>,
     pub timestamp: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct MagnetometerOutput {
     pub magnetic_field_body: Vector3<f64>,
     pub timestamp: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct GPSOutput {
     pub position: Vector3<f64>,
     pub velocity: Vector3<f64>,

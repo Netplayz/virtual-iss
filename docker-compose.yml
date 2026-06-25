@@ -135,6 +135,28 @@ services:
       - ./scenarios:/scenarios:ro
     logging: *default-logging
 
+  mdm:
+    build:
+      context: .
+      dockerfile: subsystems/mdm/Dockerfile
+    depends_on: ["nats"]
+    environment:
+      - NATS_URL=nats://nats:4222
+      - MDM_BINARY=/usr/local/bin/mdm
+      - MDM_ID=1
+      - MDM_BUS_ADDR=0x12
+    logging: *default-logging
+
+  robotics:
+    build:
+      context: .
+      dockerfile: subsystems/robotics/Dockerfile
+    depends_on: ["nats"]
+    environment:
+      - NATS_URL=nats://nats:4222
+      - ROBOTICS_BINARY=/usr/local/bin/roboticsd
+    logging: *default-logging
+
   dashboard:
     build:
       context: viz/dashboard

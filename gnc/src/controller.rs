@@ -81,6 +81,14 @@ pub struct CommandMsg {
     pub timestamp: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GNCFaultState {
+    pub star_tracker_failed: bool,
+    pub gyro_drift_rads: [f64; 3],
+    pub sun_sensor_failed: bool,
+    pub gps_failed: bool,
+}
+
 pub struct GNCController {
     pub nc: async_nats::Client,
     pub estimator: ExtendedKalmanFilter,
@@ -92,6 +100,7 @@ pub struct GNCController {
     pub cmg_gimbals: [f64; 4],
     pub latest_dynamics: Option<DynamicsStateMsg>,
     pub last_tick_time: f64,
+    pub fault_state: GNCFaultState,
 }
 
 impl GNCController {
@@ -107,6 +116,12 @@ impl GNCController {
             cmg_gimbals: [0.0; 4],
             latest_dynamics: None,
             last_tick_time: 0.0,
+            fault_state: GNCFaultState {
+                star_tracker_failed: false,
+                gyro_drift_rads: [0.0; 3],
+                sun_sensor_failed: false,
+                gps_failed: false,
+            },
         }
     }
 
@@ -196,35 +211,48 @@ impl GNCController {
             mag_body,
         );
 
-        self.estimator.update_gyro(&gyro);
+        let gyro_drift = Vector3::new(
+            self.fault_state.gyro_drift_rads[0],
+            self.fault_state.gyro_drift_rads[1],
+            self.fault_state.gyro_drift_rads[2],
+        );
+        let gyro_drifted = crate::sensors::GyroOutput {
+            angular_rate: gyro.angular_rate + gyro_drift,
+            ..gyro
+        };
+        self.estimator.update_gyro(&gyro_drifted);
         self.estimator.predict(dt);
 
         if let Some(ds) = &self.latest_dynamics {
-            let st_noise_std = self.sensor_suite.star_tracker.noise_stddev_arcsec;
-            let noise_rad = st_noise_std * (1.0 / 3600.0) * (std::f64::consts::PI / 180.0);
+            if !self.fault_state.star_tracker_failed {
+                let st_noise_std = self.sensor_suite.star_tracker.noise_stddev_arcsec;
+                let noise_rad = st_noise_std * (1.0 / 3600.0) * (std::f64::consts::PI / 180.0);
 
-            let angle_noise = self.sensor_suite.star_tracker.rng.gaussian(noise_rad);
-            let axis_noise = Vector3::new(
-                self.sensor_suite.star_tracker.rng.gaussian(1.0),
-                self.sensor_suite.star_tracker.rng.gaussian(1.0),
-                self.sensor_suite.star_tracker.rng.gaussian(1.0),
-            )
-            .normalize();
+                let angle_noise = self.sensor_suite.star_tracker.rng.gaussian(noise_rad);
+                let axis_noise = Vector3::new(
+                    self.sensor_suite.star_tracker.rng.gaussian(1.0),
+                    self.sensor_suite.star_tracker.rng.gaussian(1.0),
+                    self.sensor_suite.star_tracker.rng.gaussian(1.0),
+                )
+                .normalize();
 
-            let true_q = crate::array_to_quat(&ds.quaternion);
-            let noise_q = nalgebra::UnitQuaternion::from_axis_angle(
-                &nalgebra::Unit::new_normalize(axis_noise),
-                angle_noise,
-            );
-            let measured_q = noise_q * true_q;
+                let true_q = crate::array_to_quat(&ds.quaternion);
+                let noise_q = nalgebra::UnitQuaternion::from_axis_angle(
+                    &nalgebra::Unit::new_normalize(axis_noise),
+                    angle_noise,
+                );
+                let measured_q = noise_q * true_q;
 
-            let st_output = crate::sensors::StarTrackerOutput {
-                quat_estimate: crate::quat_to_array(&measured_q),
-                timestamp: Utc::now().to_rfc3339(),
-                error_arcsec: angle_noise.abs() * (180.0 / std::f64::consts::PI) * 3600.0,
-            };
+                let st_output = crate::sensors::StarTrackerOutput {
+                    quat_estimate: crate::quat_to_array(&measured_q),
+                    timestamp: Utc::now().to_rfc3339(),
+                    error_arcsec: angle_noise.abs() * (180.0 / std::f64::consts::PI) * 3600.0,
+                };
 
-            self.estimator.update_star_tracker(&st_output);
+                self.estimator.update_star_tracker(&st_output);
+            } else {
+                tracing::warn!("Star tracker faulted — skipping attitude update");
+            }
         }
 
         let (est_quat, est_rate) = self.estimator.get_state();
@@ -337,6 +365,57 @@ impl GNCController {
                         self.controller.reset_integral();
                         tracing::info!(target = ?self.target_attitude, "Slew command accepted");
                     }
+                }
+            }
+            "INJECT_FAULT" => {
+                if let Some(fault_type) = cmd.args.get("type").and_then(|v| v.as_str()) {
+                    tracing::warn!(fault_type = %fault_type, "Injecting GNC fault");
+                    match fault_type {
+                        "star_tracker_failure" => {
+                            self.fault_state.star_tracker_failed = true;
+                        }
+                        "gyro_drift" => {
+                            if let Some(drift) = cmd.args.get("drift_rads").and_then(|v| v.as_array()) {
+                                if drift.len() == 3 {
+                                    for (i, val) in drift.iter().enumerate() {
+                                        if let Some(n) = val.as_f64() {
+                                            self.fault_state.gyro_drift_rads[i] = n;
+                                        }
+                                    }
+                                }
+                            } else {
+                                self.fault_state.gyro_drift_rads = [0.01; 3];
+                            }
+                        }
+                        "sun_sensor_failure" => {
+                            self.fault_state.sun_sensor_failed = true;
+                        }
+                        "gps_failure" => {
+                            self.fault_state.gps_failed = true;
+                        }
+                        _ => {
+                            tracing::warn!(fault_type, "Unknown GNC fault type");
+                        }
+                    }
+                }
+            }
+            "CLEAR_FAULT" => {
+                if let Some(fault_type) = cmd.args.get("type").and_then(|v| v.as_str()) {
+                    match fault_type {
+                        "star_tracker_failure" => self.fault_state.star_tracker_failed = false,
+                        "gyro_drift" => self.fault_state.gyro_drift_rads = [0.0; 3],
+                        "sun_sensor_failure" => self.fault_state.sun_sensor_failed = false,
+                        "gps_failure" => self.fault_state.gps_failed = false,
+                        _ => {
+                            self.fault_state = GNCFaultState {
+                                star_tracker_failed: false,
+                                gyro_drift_rads: [0.0; 3],
+                                sun_sensor_failed: false,
+                                gps_failed: false,
+                            };
+                        }
+                    }
+                    tracing::info!(fault_type = %fault_type, "GNC fault cleared");
                 }
             }
             _ => {

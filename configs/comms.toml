@@ -1,0 +1,32 @@
+# Communications Configuration
+[tdrss]
+satellite_count = 3
+orbital_radius_km = 42164.0
+inclination_deg = 0.0
+longitude_spacing_deg = 130.0
+# TDRS F, G, H approximate positions
+satellites = [
+    { name = "TDRS-F", longitude_deg = 130.0 },
+    { name = "TDRS-G", longitude_deg = 0.0  },
+    { name = "TDRS-H", longitude_deg = 230.0 },
+]
+
+[s_band]
+frequency_mhz = 2287.5
+data_rate_kbps = 192.0
+tx_power_w = 20.0
+tx_gain_dbi = 20.0
+rx_gain_dbi = 45.0
+frequency_margin_db = 3.0
+
+[ku_band]
+frequency_mhz = 15030.0
+data_rate_mbps = 50.0
+tx_power_w = 50.0
+tx_gain_dbi = 30.0
+rx_gain_dbi = 50.0
+frequency_margin_db = 5.0
+
+[latency]
+base_ms = 250.0
+jitter_ms = 50.0

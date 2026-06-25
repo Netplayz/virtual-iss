@@ -1,0 +1,26 @@
+# Robotics Configuration
+[ssrms]
+dof = 7
+max_joint_speed_rad_s = 0.1
+max_tip_force_n = 100.0
+max_tip_torque_nm = 50.0
+singularity_threshold = 0.01
+
+[control]
+mode = "hold"
+joint_pid_kp = 50.0
+joint_pid_ki = 1.0
+joint_pid_kd = 5.0
+joint_integral_limit = 10.0
+joint_output_limit_nm = 200.0
+compliance_stiffness = 100.0
+compliance_damping = 10.0
+
+[limits]
+joint_0 = { min_rad = -2.96, max_rad = 2.96 }
+joint_1 = { min_rad = -2.09, max_rad = 2.09 }
+joint_2 = { min_rad = -2.96, max_rad = 2.96 }
+joint_3 = { min_rad = -2.09, max_rad = 2.09 }
+joint_4 = { min_rad = -2.96, max_rad = 2.96 }
+joint_5 = { min_rad = -2.09, max_rad = 2.09 }
+joint_6 = { min_rad = -2.96, max_rad = 2.96 }

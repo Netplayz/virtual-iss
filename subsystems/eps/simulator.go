@@ -10,6 +10,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type EPSFaults struct {
+	PanelFailures  []int    `json:"panel_failures"`
+	BatteryFailed  bool     `json:"battery_failed"`
+	BusDegradation float64  `json:"bus_degradation"`
+}
+
 type EPSState struct {
 	Timestamp      int64              `json:"timestamp"`
 	SolarPower     float64            `json:"solar_power"`
@@ -25,6 +31,7 @@ type EPSState struct {
 	InSun          bool               `json:"in_sun"`
 	LoadStates     map[string]bool    `json:"load_states"`
 	BetaAngle      float64            `json:"beta_angle"`
+	Faults         EPSFaults          `json:"faults"`
 }
 
 type DynamicsState struct {
@@ -77,6 +84,7 @@ func NewEPSSimulator(nc *nats.Conn) *EPSSimulator {
 			BusVoltage:     160.0,
 			MaxPower:       bus.MaxPower,
 			LoadStates:     make(map[string]bool),
+			Faults:         EPSFaults{},
 		},
 		log: logrus.WithField("subsystem", "eps"),
 	}
@@ -123,7 +131,14 @@ func (e *EPSSimulator) handleTick() {
 	e.State.InSun = dyn.InSun
 	e.State.BetaAngle = dyn.BetaAngle
 
-	current, voltage, solarPower := e.Solar.ComputePower(dyn.BetaAngle, dyn.InSun, 1361.0)
+	solarIrradiance := 1361.0
+	for _, p := range e.State.Faults.PanelFailures {
+		if p >= 0 && p < e.Solar.PanelCount {
+			solarIrradiance *= 0.0
+		}
+	}
+
+	current, voltage, solarPower := e.Solar.ComputePower(dyn.BetaAngle, dyn.InSun, solarIrradiance)
 	e.State.SolarCurrent = current
 	e.State.SolarVoltage = voltage
 	e.State.SolarPower = solarPower
@@ -132,7 +147,9 @@ func (e *EPSSimulator) handleTick() {
 	e.State.TotalLoad = totalLoad
 
 	for _, bat := range e.Batteries {
-		if solarPower > totalLoad {
+		if e.State.Faults.BatteryFailed {
+			bat.ForceDischarge(0.05)
+		} else if solarPower > totalLoad {
 			excess := solarPower - totalLoad
 			bat.Charge(excess, 1.0)
 		} else if totalLoad > solarPower {
@@ -141,6 +158,8 @@ func (e *EPSSimulator) handleTick() {
 		}
 		bat.ThermalModel(20.0)
 	}
+
+	e.State.BusVoltage = e.Bus.BusVoltage * (1.0 - e.State.Faults.BusDegradation)
 
 	if len(e.Batteries) > 0 {
 		bat := e.Batteries[0]
@@ -159,7 +178,6 @@ func (e *EPSSimulator) handleTick() {
 		}
 	}
 
-	e.State.BusVoltage = e.Bus.BusVoltage
 	e.State.TotalLoad = e.Bus.ComputeTotalLoad()
 
 	e.State.LoadStates = make(map[string]bool)
@@ -197,5 +215,92 @@ func (e *EPSSimulator) handleCommand(cmd Command) {
 		e.Bus.ShedLoad()
 		e.State.Shedding = true
 		e.log.Info("load shed triggered")
+
+	// --- Fault injection commands ---
+	case "SET_FAULT":
+		var faultCmd struct {
+			Type   string          `json:"type"`
+			Params json.RawMessage `json:"params"`
+		}
+		if err := json.Unmarshal([]byte(cmd.Payload), &faultCmd); err != nil {
+			e.log.WithError(err).Error("failed to parse SET_FAULT params")
+			return
+		}
+		e.injectFault(faultCmd.Type, faultCmd.Params)
+
+	case "CLEAR_FAULT":
+		var faultCmd struct {
+			Type string `json:"type"`
+		}
+		if err := json.Unmarshal([]byte(cmd.Payload), &faultCmd); err != nil {
+			e.log.WithError(err).Error("failed to parse CLEAR_FAULT params")
+			return
+		}
+		e.clearFault(faultCmd.Type)
 	}
+}
+
+func (e *EPSSimulator) injectFault(faultType string, params json.RawMessage) {
+	switch faultType {
+	case "solar_array_failure":
+		var p struct {
+			PanelID int `json:"panel_id"`
+		}
+		if err := json.Unmarshal(params, &p); err != nil {
+			e.log.WithError(err).Error("solar_array_fault: bad params")
+			return
+		}
+		for _, id := range e.State.Faults.PanelFailures {
+			if id == p.PanelID {
+				return
+			}
+		}
+		e.State.Faults.PanelFailures = append(e.State.Faults.PanelFailures, p.PanelID)
+		e.log.WithField("panel", p.PanelID).Warn("solar array panel failed")
+
+	case "battery_failure":
+		e.State.Faults.BatteryFailed = true
+		e.log.Warn("battery failure injected")
+
+	case "bus_degradation":
+		var p struct {
+			Amount float64 `json:"amount"`
+		}
+		if err := json.Unmarshal(params, &p); err != nil {
+			e.log.WithError(err).Error("bus_degradation: bad params")
+			return
+		}
+		e.State.Faults.BusDegradation = clamp(p.Amount, 0.0, 0.5)
+		e.log.WithField("degradation", e.State.Faults.BusDegradation).Warn("bus degradation injected")
+
+	default:
+		e.log.WithField("fault_type", faultType).Warn("unknown EPS fault type")
+	}
+}
+
+func (e *EPSSimulator) clearFault(faultType string) {
+	switch faultType {
+	case "solar_array_failure":
+		e.State.Faults.PanelFailures = nil
+		e.log.Info("all solar array faults cleared")
+	case "battery_failure":
+		e.State.Faults.BatteryFailed = false
+		e.log.Info("battery fault cleared")
+	case "bus_degradation":
+		e.State.Faults.BusDegradation = 0.0
+		e.log.Info("bus degradation cleared")
+	default:
+		e.State.Faults = EPSFaults{}
+		e.log.Info("all EPS faults cleared")
+	}
+}
+
+func clamp(v, lo, hi float64) float64 {
+	if v < lo {
+		return lo
+	}
+	if v > hi {
+		return hi
+	}
+	return v
 }

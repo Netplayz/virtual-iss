@@ -1,0 +1,24 @@
+# Crew Configuration
+[crew]
+count = 7
+nationalities = ["USA", "USA", "RUS", "RUS", "JPN", "EU", "USA"]
+
+[consumption]
+o2_per_person_kg_day = 0.84
+co2_per_person_kg_day = 1.0
+water_per_person_l_day = 2.8
+food_per_person_kg_day = 1.8
+metabolic_power_per_person_w = 100.0
+
+[schedule]
+wake_hour = 6.0
+sleep_hour = 22.0
+work_period_hours = 8.0
+exercise_period_min = 60
+meal_period_min = 30
+leisure_period_hours = 2.0
+
+[activities]
+types = ["experiment", "maintenance", "exercise", "meal", "leisure", "sleep", "eva_prep"]
+experiment_hours_per_day = 6.0
+maintenance_hours_per_day = 2.0

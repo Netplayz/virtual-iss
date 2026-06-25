@@ -68,6 +68,15 @@ func (b *Battery) Discharge(loadW float64, dtSec float64) {
 	}
 }
 
+func (b *Battery) ForceDischarge(rate float64) {
+	totalCapacity := b.Capacity * float64(b.Count)
+	loss := rate * totalCapacity
+	b.SOC -= loss
+	if b.SOC < 0 {
+		b.SOC = 0
+	}
+}
+
 func (b *Battery) GetSOC() float64 {
 	return b.SOC
 }

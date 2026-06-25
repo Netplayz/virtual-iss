@@ -1,0 +1,36 @@
+# Command & Data Handling Configuration
+[telemetry]
+packet_version = 2
+sequence_number = 1
+default_rate_hz = 1.0
+
+[limit_checking]
+red_high_warning = false
+yellow_tolerance_pct = 0.05
+
+[stored_commands]
+max_sequences = 32
+max_commands_per_sequence = 100
+default_execution_delay_ms = 100
+
+[limits.dynamics]
+attitude_error_red_deg = 5.0
+attitude_error_yellow_deg = 2.0
+rate_red_degs = 0.5
+rate_yellow_degs = 0.2
+
+[limits.eps]
+bus_voltage_low_red_v = 113.0
+bus_voltage_low_yellow_v = 117.0
+bus_voltage_high_red_v = 126.0
+bus_voltage_high_yellow_v = 124.0
+battery_soc_low_red_pct = 0.15
+battery_soc_low_yellow_pct = 0.25
+
+[limits.eclss]
+o2_partial_low_red_kpa = 19.0
+o2_partial_low_yellow_kpa = 20.0
+co2_partial_high_red_kpa = 0.5
+co2_partial_high_yellow_kpa = 0.4
+temp_high_red_c = 30.0
+temp_high_yellow_c = 27.0

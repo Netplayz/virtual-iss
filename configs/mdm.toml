@@ -1,0 +1,27 @@
+# MDM Flight Software Configuration
+[mdm]
+id = 1
+bus_address = 0x12
+fw_version = "3.1.0"
+cpu_mhz = 20.0
+ram_kb = 512
+rom_kb = 1024
+
+[bus_1553]
+type = "MIL-STD-1553B"
+dual_redundant = true
+data_rate_mbps = 1.0
+word_size_bits = 16
+max_rt_count = 31
+frame_check = "crc-16-ibm"
+
+[scheduler]
+tick_rate_ms = 10
+frames = [10, 100, 1000, 10000]
+minor_frame_cycles = [1, 10, 100, 1000]
+
+[limits]
+max_cmd_queue = 64
+max_seq_store = 16
+internal_temp_max_c = 85.0
+stack_size_bytes = 4096
