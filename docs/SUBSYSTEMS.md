@@ -29,3 +29,9 @@ Telemetry stream recording to JSONL files. Time-indexed replay at variable rate.
 
 ## MCP (Python)
 Model Context Protocol server exposing simulation as tools/resources. AI agents can query telemetry, send commands, inject faults, and manage scenarios. OpenAPI 3.1 + SSE streaming.
+
+## MDM (C)
+Legacy embedded flight software simulation targeting 80386EX processor. MIL-STD-1553B bus protocol with BC/RT simulation. Cyclic executive scheduler with 10ms/100ms/1s/10s frames. CRC-16-IBM packet validation. Stored command sequences. Communicates via stdin/stdout pipe to a Python bridge (`bridge.py`) that relays to NATS.
+
+## Robotics (C++)
+SSRMS (Space Station Remote Manipulator System) 7-DOF robotic arm. DH-parameter kinematics with forward/inverse solutions and Jacobian computation. Multiplicative EKF-style joint control with PID position and compliance force control. Quintic polynomial trajectory planning with multi-waypoint support. Safety monitoring for joint limits, tip force/torque, and singularity avoidance.

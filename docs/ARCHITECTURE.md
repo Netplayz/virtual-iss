@@ -39,3 +39,9 @@ Each subsystem:
 ## Fault Injection
 
 Faults are defined in scenario JSON and executed by the orchestrator at specified sim times. Each fault targets a subsystem with a type and parameters.
+
+## Legacy & Special Modules
+
+**MDM** runs as a separate C process outside Docker, communicating via stdin/stdout pipe to `bridge.py` (Python) which connects to NATS. This simulates the original MIL-STD-1553B remote terminal interface without Docker networking.
+
+**Robotics** builds with CMake + Eigen3 as a standalone C++20 target. Runs a 100 Hz control loop. Currently standalone — NATS integration (tick subscription, telemetry publish, command dispatch) is planned. Dockerfile and compose entry pending.

@@ -22,6 +22,8 @@ Orchestrator ──► NATS Bus ◄── Subsystems (Rust/Go/Python)
 - **Crew** (Python) — Activity timeline, consumables, task execution
 - **NAS** (Go) — Telemetry recording/replay, object storage, HTTP API
 - **MCP** (Python) — Model Context Protocol server for AI agent integration
+- **MDM** (C) — Legacy 80386EX flight software with MIL-STD-1553B bus simulation, cyclic executive scheduler
+- **Robotics** (C++) — SSRMS 7-DOF robotic arm with DH kinematics, PID control, trajectory planning
 - **Orchestrator** (Python) — Time sync, scenario control, fault injection
 
 ## Quick Start
@@ -41,6 +43,11 @@ docker compose up
 |----------|-------------|
 | `nominal_ops` | Standard 90-min orbit, all subsystems nominal |
 | `load_shed_test` | Solar array failure triggering automatic load shedding |
+
+## Agent Context
+
+- **AGENTS.md** — Build commands, conventions, and subsystem map for coding agents
+- **CLAUDE.md** — opencode-specific context, critical rules, and verification steps
 
 ## Extending
 
