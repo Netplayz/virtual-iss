@@ -1,0 +1,75 @@
+[gd_scene load_steps=6 format=3 uid="uid://b7okxdq81dmqg"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/camera.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/iss_model.gd" id="4"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_earth"]
+radius = 6371.0
+height = 6371.0
+
+[sub_resource type="Environment" id="Environment_space"]
+background = Color(0.0, 0.0, 0.0, 1.0)
+ambient_light_color = Color(0.05, 0.05, 0.08, 1.0)
+ambient_light_energy = 0.3
+fog_enabled = false
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_space")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+light_energy = 1.5
+light_angular_distance = 0.5
+shadow_enabled = true
+shadow_bias = 0.02
+transform = Transform3D(1, 0, 0, 0, 0.707, 0.707, 0, -0.707, 0.707, 0, 0, 0)
+rotation_degrees = Vector3(-45, 30, 0)
+
+[node name="Earth" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Earth"]
+mesh = SubResource("SphereMesh_earth")
+
+[node name="ISS" type="Node3D" parent="."]
+script = ExtResource("4")
+
+[node name="SolarArray_Left" type="Node3D" parent="ISS"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 0)
+
+[node name="SolarArray_Right" type="Node3D" parent="ISS"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 0)
+
+[node name="Radiator_Left" type="Node3D" parent="ISS"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+
+[node name="Radiator_Right" type="Node3D" parent="ISS"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+current = true
+script = ExtResource("2")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 50, 100)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+layer = 10
+script = ExtResource("3")
+
+[node name="TelemetryLabel" type="Label" parent="HUD"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_font_sizes/font_size = 12
+
+[node name="AlarmLabel" type="Label" parent="HUD"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 200.0
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 14
+visible = false

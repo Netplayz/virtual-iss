@@ -1,0 +1,19 @@
+; Godot 4 project configuration for Virtual ISS Visualization
+[application]
+config/name = "Virtual ISS"
+config/description = "Real-time 3D visualization of the International Space Station simulation"
+run/main_scene = "res://scenes/main.tscn"
+config/features = ["4.4"]
+
+[rendering]
+renderer/rendering_method = "forward_plus"
+environment/default_environment = "res://textures/default_env.tres"
+
+[physics]
+common/enable_pause_aware_picking = true
+
+[input_devices]
+pointing/emulate_touch_from_mouse = true
+
+[network]
+limits/debugger_limits/max_queued_messages = 8192
