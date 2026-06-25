@@ -1,5 +1,10 @@
 target/
 node_modules/
+*.o
+*.a
+*.so
+mdm
+mdm.bin
 __pycache__/
 *.pyc
 *.pyo
