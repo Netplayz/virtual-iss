@@ -29,6 +29,7 @@ class CabinAtmosphere:
         crew_count: int,
         o2_produced: float,
         co2_removed: float,
+        leak_rate: float = 0.0,
     ) -> None:
         o2_consumed = crew_count * self._o2_per_person_kg_s * dt_s
         co2_produced = crew_count * self._co2_per_person_kg_s * dt_s
@@ -42,6 +43,9 @@ class CabinAtmosphere:
 
         o2_mass += net_o2
         co2_mass += net_co2
+
+        if leak_rate > 0:
+            self.pressure_kpa -= leak_rate * dt_s
 
         o2_mass = max(o2_mass, 0.01 * air_mass_kg)
         co2_mass = max(co2_mass, 0.0)
