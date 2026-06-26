@@ -23,6 +23,4 @@ pub fn array_to_vec3(arr: &[f64; 3]) -> Vector3<f64> {
     Vector3::new(arr[0], arr[1], arr[2])
 }
 
-pub fn vec3_from_msg(x: f64, y: f64, z: f64) -> Vector3<f64> {
-    Vector3::new(x, y, z)
-}
+
