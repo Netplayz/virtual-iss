@@ -153,9 +153,7 @@ impl DynamicsEngine {
         #[derive(Deserialize)]
         struct Command {
             action: String,
-            #[serde(default)]
             target_quat: Option<[f64; 4]>,
-            #[serde(default)]
             target_rate: Option<[f64; 3]>,
         }
 
