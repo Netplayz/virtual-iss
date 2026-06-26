@@ -100,7 +100,9 @@ func (c *CommsSimulator) handleTick() {
 	var dyn DynamicsState
 	msg, err := c.nc.Request("telemetry.dynamics.state", nil, 100*time.Millisecond)
 	if err == nil {
-		json.Unmarshal(msg.Data, &dyn)
+		if err := json.Unmarshal(msg.Data, &dyn); err != nil {
+			c.log.WithError(err).Warn("failed to parse dynamics telemetry")
+		}
 	}
 
 	c.State.Timestamp = time.Now().UnixMilli()
