@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import os
 import time
 from datetime import datetime, timezone
 from typing import Any
@@ -11,7 +12,10 @@ from .scenario import Scenario
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_SCENARIO_PATH = "/home/ken/virtual-iss/configs/scenarios/nominal_ops.json"
+DEFAULT_SCENARIO_PATH = os.environ.get(
+    "SCENARIO_PATH",
+    "configs/scenarios/nominal_ops.json",
+)
 TICK_RATE_HZ = 10.0
 TICK_INTERVAL_S = 1.0 / TICK_RATE_HZ
 
