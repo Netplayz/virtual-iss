@@ -2,7 +2,6 @@ use nalgebra::{Matrix3, SMatrix, UnitQuaternion, Unit, Vector3};
 use crate::sensors::{GyroOutput, StarTrackerOutput};
 
 type Matrix6 = SMatrix<f64, 6, 6>;
-type Matrix3x6 = SMatrix<f64, 3, 6>;
 
 #[derive(Debug, Clone)]
 pub struct GnCEstimationState {
