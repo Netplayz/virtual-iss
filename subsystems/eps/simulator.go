@@ -124,7 +124,9 @@ func (e *EPSSimulator) handleTick() {
 	var dyn DynamicsState
 	msg, err := e.nc.Request("telemetry.dynamics.state", nil, 100*time.Millisecond)
 	if err == nil {
-		json.Unmarshal(msg.Data, &dyn)
+		if err := json.Unmarshal(msg.Data, &dyn); err != nil {
+			e.log.WithError(err).Warn("failed to parse dynamics telemetry")
+		}
 	}
 
 	e.State.Timestamp = time.Now().UnixMilli()
@@ -132,10 +134,15 @@ func (e *EPSSimulator) handleTick() {
 	e.State.BetaAngle = dyn.BetaAngle
 
 	solarIrradiance := 1361.0
+	panelCount := e.Solar.PanelCount
+	failedCount := len(e.State.Faults.PanelFailures)
 	for _, p := range e.State.Faults.PanelFailures {
-		if p >= 0 && p < e.Solar.PanelCount {
-			solarIrradiance *= 0.0
+		if p < 0 || p >= panelCount {
+			failedCount--
 		}
+	}
+	if failedCount > 0 {
+		solarIrradiance *= float64(panelCount-failedCount) / float64(panelCount)
 	}
 
 	current, voltage, solarPower := e.Solar.ComputePower(dyn.BetaAngle, dyn.InSun, solarIrradiance)
