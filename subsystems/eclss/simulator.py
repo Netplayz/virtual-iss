@@ -78,6 +78,7 @@ class ECLSSSimulator:
             )
             self.co2_scrubber.regeneration_cycle()
 
+        recovered = 0.0
         if not self.faults.water_recovery_failed:
             w_rec = self.water_recovery
             urine_l = crew_count_urine(self.crew_count, dt_s)
@@ -104,7 +105,7 @@ class ECLSSSimulator:
             cabin_pressure_kpa=cabin_state["cabin_pressure_kpa"],
             o2_produced_kg=o2_produced,
             co2_removed_kg=co2_removed,
-            water_recovered_l=recovered if not self.faults.water_recovery_failed else 0.0,
+            water_recovered_l=recovered,
             power_w=self.o2_gen.get_power_demand(),
             faults=self.faults,
         )
