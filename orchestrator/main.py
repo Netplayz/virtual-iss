@@ -2,6 +2,7 @@
 """Orchestrator — simulation time keeper and scenario controller."""
 import asyncio
 import logging
+import os
 
 import nats
 
