@@ -48,5 +48,5 @@ class ActivityTimeline:
         return None
 
     @staticmethod
-    def _fallback_activity() -> Activity:
+    def fallback_activity() -> Activity:
         return Activity("standby", 3600.0, 4, 0.8)

@@ -51,7 +51,7 @@ class CrewSimulator:
         current = self.timeline.get_current_activity(self.sim_time)
         next_act = self.timeline.get_next_activity(self.sim_time)
 
-        activity = current or ActivityTimeline._fallback_activity()
+        activity = current or self.timeline.fallback_activity()
         self.consumables.consume(self.crew_count, dt_s)
 
         remaining = self.consumables.get_remaining()
