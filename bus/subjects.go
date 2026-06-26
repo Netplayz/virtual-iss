@@ -45,5 +45,5 @@ const (
 	OrchTick        = "orchestrator.tick"
 	OrchStatus      = "orchestrator.status"
 	OrchScenario    = "orchestrator.scenario"
-	OrchTime         = "orchestrator.time"
+	OrchTime        = "orchestrator.time"
 )
