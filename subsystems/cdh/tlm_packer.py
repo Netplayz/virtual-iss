@@ -1,7 +1,6 @@
 import hashlib
 import struct
 import time
-from typing import Any
 
 
 def pack_telemetry(subsystem: str, data: dict) -> dict:
