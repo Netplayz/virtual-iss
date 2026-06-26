@@ -29,7 +29,7 @@ class ConsumablesTracker:
         self._o2_kg = max(0.0, self._o2_kg)
 
         logger.debug(
-            "Consumed resources for %d crew over %.1f s: food=%.3f kg, water=%.3f L, O2=%.3f kg",
+            "Remaining resources for %d crew over %.1f s: food=%.3f kg, water=%.3f L, O2=%.3f kg",
             crew_count,
             dt_s,
             self._food_kg,
