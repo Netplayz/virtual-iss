@@ -1,0 +1,86 @@
+{
+  "id": "toaster_impact",
+  "name": "Toaster Strike",
+  "description": "A rogue toaster (space debris from a jettisoned kitchen appliance) impacts the ISS at orbital velocity, causing cascading failures: solar array damage, attitude upset, cabin depressurization, and eventual power system collapse.",
+  "initial_orbit": {
+    "semi_major_axis_km": 6780.0,
+    "eccentricity": 0.001,
+    "inclination_deg": 51.64,
+    "raan_deg": 45.0,
+    "arg_perigee_deg": 0.0,
+    "true_anomaly_deg": 0.0
+  },
+  "subsystems": ["dynamics", "gnc", "eps", "eclss", "thermal", "comms", "cdh", "crew"],
+  "duration_sec": 3600.0,
+  "time_scale": 1.0,
+  "crew_count": 7,
+  "initial_beta_angle_deg": 60.0,
+  "faults": [
+    {
+      "time_sec": 60.0,
+      "subsystem": "gnc",
+      "type": "star_tracker_failure",
+      "params": {}
+    },
+    {
+      "time_sec": 60.0,
+      "subsystem": "gnc",
+      "type": "gyro_drift",
+      "params": {}
+    },
+    {
+      "time_sec": 60.0,
+      "subsystem": "eps",
+      "type": "solar_array_failure",
+      "params": { "panel_id": 0 }
+    },
+    {
+      "time_sec": 60.0,
+      "subsystem": "eclss",
+      "type": "cabin_leak",
+      "params": { "leak_rate_kpa_s": 0.008 }
+    },
+    {
+      "time_sec": 120.0,
+      "subsystem": "eps",
+      "type": "bus_degradation",
+      "params": { "amount": 0.15 }
+    },
+    {
+      "time_sec": 120.0,
+      "subsystem": "eclss",
+      "type": "water_recovery_fault",
+      "params": {}
+    },
+    {
+      "time_sec": 240.0,
+      "subsystem": "eps",
+      "type": "battery_failure",
+      "params": {}
+    },
+    {
+      "time_sec": 240.0,
+      "subsystem": "eclss",
+      "type": "o2_gen_fault",
+      "params": {}
+    },
+    {
+      "time_sec": 300.0,
+      "subsystem": "gnc",
+      "type": "sun_sensor_failure",
+      "params": {}
+    },
+    {
+      "time_sec": 400.0,
+      "subsystem": "eclss",
+      "type": "co2_scrub_fault",
+      "params": {}
+    },
+    {
+      "time_sec": 600.0,
+      "subsystem": "eps",
+      "type": "solar_array_failure",
+      "params": { "panel_id": 1 }
+    }
+  ]
+}
