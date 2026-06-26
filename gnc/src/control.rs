@@ -23,7 +23,7 @@ impl ControlMode {
         }
     }
 
-    pub fn from_str(s: &str) -> Option<Self> {
+    pub fn from_str_option(s: &str) -> Option<Self> {
         match s {
             "idle" => Some(ControlMode::Idle),
             "sun_pointing" => Some(ControlMode::SunPointing),
