@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
 type TDRSSatellite struct {
 	Name          string
 	Longitude     float64 // geostationary longitude
@@ -13,7 +17,7 @@ type TDRSSatellite struct {
 	Active        bool
 }
 
-type TDREPass struct {
+type TDRSPass struct {
 	StartTime time.Time
 	EndTime   time.Time
 }
@@ -21,7 +25,7 @@ type TDREPass struct {
 type TDRSSystem struct {
 	Satellites []*TDRSSatellite
 	ActiveLink string
-	Schedule   []TDREPass
+	Schedule   []TDRSPass
 }
 
 func NewTDRSSystem() *TDRSSystem {
@@ -85,7 +89,7 @@ func (ts *TDRSSystem) SchedulePass(durationSec float64) (startTime, endTime time
 	startTime = time.Now().Add(time.Duration(rand.Float64() * 3600 * float64(time.Second)))
 	endTime = startTime.Add(time.Duration(durationSec) * time.Second)
 
-	ts.Schedule = append(ts.Schedule, TDREPass{
+	ts.Schedule = append(ts.Schedule, TDRSPass{
 		StartTime: startTime,
 		EndTime:   endTime,
 	})
