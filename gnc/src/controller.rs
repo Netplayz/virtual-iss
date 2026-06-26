@@ -5,7 +5,7 @@ use chrono::Utc;
 use futures::StreamExt;
 use nalgebra::Vector3;
 use serde::{Deserialize, Serialize};
-use tracing;
+
 
 use crate::control::{AttitudeController, ControlMode};
 use crate::estimator::ExtendedKalmanFilter;
@@ -330,7 +330,7 @@ impl GNCController {
         match cmd.opcode.as_str() {
             "SET_CONTROL_MODE" => {
                 if let Some(mode_str) = cmd.args.get("mode").and_then(|v| v.as_str()) {
-                    if let Some(mode) = ControlMode::from_str(mode_str) {
+                    if let Some(mode) = ControlMode::from_str_option(mode_str) {
                         self.control_mode = mode;
                         self.controller.reset_integral();
                         tracing::info!(mode = %mode_str, "Control mode changed");
