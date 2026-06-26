@@ -11,7 +11,7 @@ import nats
 from aiohttp import web
 
 from handlers import CommandHandler, ScenarioHandler, SystemHandler, TelemetryHandler
-from schema import ALL_TOOLS, ALL_RESOURCES, get_tool, tool_def_to_dict
+from schema import ALL_TOOLS, tool_def_to_dict
 
 logger = logging.getLogger("mcp.server")
 
