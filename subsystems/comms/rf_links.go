@@ -4,12 +4,6 @@ import (
 	"math"
 )
 
-type RFBand struct {
-	FrequencyHz  float64
-	BandwidthHz  float64
-	DataRateBps  float64
-}
-
 type SBandLink struct {
 	UplinkRate   float64 // bps
 	DownlinkRate float64 // bps
@@ -44,7 +38,6 @@ func NewKuBandLink() *KuBandLink {
 
 func ComputeLinkBudget(txPowerW, txGainDb, rxGainDb, distanceM, freqHz float64) (rxPowerW, snrDb float64) {
 	c := 299792458.0
-	wavelength := c / freqHz
 
 	txPowerDBW := 10 * math.Log10(txPowerW)
 
