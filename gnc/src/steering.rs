@@ -2,7 +2,6 @@ use anyhow::{bail, Result};
 use nalgebra::{Matrix3, SMatrix, Vector3};
 
 type Matrix3x4 = SMatrix<f64, 3, 4>;
-type Matrix4x3 = SMatrix<f64, 4, 3>;
 
 const SKEW_ANGLE_RAD: f64 = 0.9553;
 const CMG_MOMENTUM_NMS: f64 = 3500.0;
